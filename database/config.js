@@ -15,7 +15,6 @@ const dbConnection = async ()=>{
         throw new Error("Erroe en la DB");           
     }
 
-
 }
 
 module.exports= {

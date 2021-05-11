@@ -3,10 +3,22 @@ const bcryptjs = require('bcryptjs');
 
 const User = require('../models/users.model');
 
-const usersGet = async (req,res = response)=>{
+const usersGet = async (req = request,res = response)=>{
+    const {desde = 0,limit = 5} = req.query;
+   /* const user = await User.find()
+                .skip(Number(desde))
+                .limit(Number(limit));
+    const count = await User.countDocuments();*/
+
+    const [user,count] = await Promise.all([
+        User.countDocuments(),
+        User.find()
+            .skip(Number(desde))
+            .limit(Number(limit))
+    ])
     return res.json({
-        msg: "get - 200 ok"
-    })
+        count,user
+    });
 };
 
 const usersPost = async (req,res = response)=>{
@@ -31,14 +43,17 @@ const usersPost = async (req,res = response)=>{
         user
     })
 };
-const usersUpdate = (req = request,res = response)=>{
-    const {id} = req.params;
-    const { name, lastname} = req.query;
+const usersUpdate = async (req = request,res = response)=>{
+    const { password, google,...resto} = req.body;
+    // TODO validar contra base de datos
+    if(password){
+        const salt = bcryptjs.genSaltSync();
+        resto.password = bcryptjs.hashSync(password,salt);
+    }
+    const user = await User.findByIdAndUpdate(req.params.id,resto);
     return res.json({
         msg: "update - 200 ok",
-        id,
-        name,
-        lastname
+        id: req.params.id
     })
 };
 const usersDelete = (req,res = response)=>{
