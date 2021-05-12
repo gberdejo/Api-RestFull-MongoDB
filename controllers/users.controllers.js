@@ -10,7 +10,7 @@ const usersGet = async (req = request,res = response)=>{
                 .limit(Number(limit));
     const count = await User.countDocuments();*/
 
-    const [user,count] = await Promise.all([
+    const [count,user,] = await Promise.all([
         User.countDocuments(),
         User.find()
             .skip(Number(desde))
@@ -56,9 +56,11 @@ const usersUpdate = async (req = request,res = response)=>{
         id: req.params.id
     })
 };
-const usersDelete = (req,res = response)=>{
+const usersDelete = async (req,res = response)=>{
+    const user = await User.findByIdAndDelete(req.params.id);
     return res.json({
-        msg: "delete - 200 ok"
+        msg: "delete - 200 ok",
+        user
     })
 };
 
