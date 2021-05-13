@@ -1,6 +1,7 @@
 const User = require("../models/users.model");
 const bcript = require('bcryptjs');
 const { generateJWT } = require("../helpers/generate-jwt");
+const {googleVerify} = require('../helpers/google-verify');
 const login = async(req, res) => {
     const { email, password } = req.body;
     try {
@@ -27,7 +28,33 @@ const login = async(req, res) => {
         })
     }
 }
+const googlesignin = async(req,res)=>{
 
+    const { id_token } = req.body;
+    try {
+        const {name,email,img} = await googleVerify(id_token);
+        const user = await User.findOne({email});
+        if(!user){
+            const data = {
+                name,
+                email,
+                img,
+                password: ":P",
+                google:true,
+            }
+            const user = await User.create(data);
+            await user.save();
+        }
+        if(!user.state){
+            res.status(401).json({msg:"Hable con el admin"});
+        }
+        const token = await generateJWT(user.id);
+    
+        res.json({msg:"ok",user,token});
+    } catch (error) {
+        
+    }
+}
 module.exports = {
-    login
+    login,googlesignin
 }

@@ -72,10 +72,11 @@ const usersPatch = (req, res = response) => {
         msg: "Patch - 200 ok"
     })
 };
+
 module.exports = {
     usersGet,
     usersPost,
     usersUpdate,
     usersDelete,
-    usersPatch
+    usersPatch,
 }
